@@ -1,26 +1,43 @@
 import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { Todo } from './entities/todo.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TodosService {
+  constructor(
+    @InjectRepository(Todo)
+    private todosRepository: Repository<Todo>,
+  ){}
   create(createTodoDto: CreateTodoDto) {
-    return 'This action adds a new todo';
+    const newTodo = this.todosRepository.create(createTodoDto);
+    console.log(newTodo);
+    return this.todosRepository.save(newTodo);
   }
 
   findAll() {
-    return `This action returns all todos`;
+    return this.todosRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} todo`;
+  async findOne(id: number) {
+    return this.todosRepository.find({
+      where: {
+        id: id
+      }
+    })
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+  async update(id: number, updateTodoDto: UpdateTodoDto) {
+    const todo = await this.findOne(id);
+    const user = {...todo, ...updateTodoDto};
+    console.log(user)
+    return this.todosRepository.save({...todo, ...updateTodoDto});
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} todo`;
+  async remove(id: number) {
+    const todo = await this.findOne(id);
+    return this.todosRepository.remove(todo);
   }
 }
