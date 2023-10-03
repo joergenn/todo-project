@@ -9,20 +9,20 @@ import { Repository } from 'typeorm';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private users: Repository<User>,
   ){}
 
   create(createUserDto: CreateUserDto) {
-    const newUser = this.usersRepository.create(createUserDto);
-    return this.usersRepository.save(newUser);
+    const newUser = this.users.create(createUserDto);
+    return this.users.save(newUser);
   }
 
   findAll() {
-    return this.usersRepository.find();
+    return this.users.find();
   }
 
   async findOne(id: number) {
-    const user = await this.usersRepository.find({
+    const user = await this.users.find({
       where: {
         id: id
       }
@@ -38,11 +38,11 @@ export class UsersService {
     Object.keys(updateUserDto).forEach(key => {
       user[0][key] = updateUserDto[key];
     })
-    return this.usersRepository.save(user);
+    return this.users.save(user);
   }
 
   async remove(id: number) {
     const user = await this.findOne(id);
-    return this.usersRepository.remove(user);
+    return this.users.remove(user);
   }
 }

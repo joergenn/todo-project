@@ -6,5 +6,8 @@ export class CreateTodoDto {
         description: "Title of todo"
     })
     title: string;
-    userId: User;
+    @ApiProperty({
+        description: "Foreign key from user table"
+    })
+    userId: number;
 }

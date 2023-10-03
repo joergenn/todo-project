@@ -9,20 +9,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class TodosService {
   constructor(
     @InjectRepository(Todo)
-    private todosRepository: Repository<Todo>,
+    private todos: Repository<Todo>,
   ){}
   create(createTodoDto: CreateTodoDto) {
-    const newTodo = this.todosRepository.create(createTodoDto);
+    const newTodo = this.todos.create(createTodoDto);
     console.log(newTodo);
-    return this.todosRepository.save(newTodo);
+    return this.todos.save(newTodo);
   }
 
   findAll() {
-    return this.todosRepository.find();
+    console.log(process.env)
+    return this.todos.find();
   }
 
   async findOne(id: number) {
-    const todo = await this.todosRepository.find({
+    const todo = await this.todos.find({
       where: {
         id: id
       }
@@ -35,11 +36,11 @@ export class TodosService {
 
   async update(id: number, updateTodoDto: UpdateTodoDto) {
     const todo = await this.findOne(id); 
-    return this.todosRepository.save({...todo[0], ...updateTodoDto});
+    return this.todos.save({...todo[0], ...updateTodoDto});
   }
 
   async remove(id: number) {
     const todo = await this.findOne(id);
-    return this.todosRepository.remove(todo);
+    return this.todos.remove(todo);
   }
 }
