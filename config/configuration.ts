@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import * as Joi from 'joi';
+import { DataSource, DataSourceOptions } from "typeorm";
 
 const schema = Joi.object({
     DB_PORT: Joi.number().required(),
@@ -8,17 +9,6 @@ const schema = Joi.object({
     DB_NAME: Joi.string().required(),
     DB_HOST: Joi.string().required()
 })
-
-const configuration:TypeOrmModuleOptions = {
-    port: parseInt(process.env.DB_PORT),
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    type: "mysql",
-    entities: ['./dist/**/*.entity.js'],
-    synchronize: true
-};
 
 const {value, error} = schema.validate({
     DB_PORT: process.env.DB_PORT,
@@ -32,4 +22,16 @@ if(error){
     throw new Error("Config validation failed")
 }
 
-export default configuration;
+export const configuration: DataSourceOptions = {
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    type: "mysql",
+    entities: ['./dist/**/*.entity.js'],
+    migrations: ['.//db/migrations/*.js']
+};
+
+export const dataSource = new DataSource(configuration);
+export default dataSource;
