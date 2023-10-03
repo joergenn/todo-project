@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,16 +22,23 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return this.usersRepository.find({
+    const user = await this.usersRepository.find({
       where: {
         id: id
       }
-    })
+    });
+    if(Object.keys(user).length === 0) {
+      throw new HttpException("User with such id not found", HttpStatus.NOT_FOUND)
+    }; 
+    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id);
-    return this.usersRepository.save({...user, ...updateUserDto});
+    Object.keys(updateUserDto).forEach(key => {
+      user[0][key] = updateUserDto[key];
+    })
+    return this.usersRepository.save(user);
   }
 
   async remove(id: number) {

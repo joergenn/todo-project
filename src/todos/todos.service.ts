@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -22,18 +22,20 @@ export class TodosService {
   }
 
   async findOne(id: number) {
-    return this.todosRepository.find({
+    const todo = await this.todosRepository.find({
       where: {
         id: id
       }
-    })
+    });
+    if(Object.keys(todo).length === 0) {
+      throw new HttpException("Todo with such id not found", HttpStatus.NOT_FOUND)
+    }; 
+    return todo;
   }
 
   async update(id: number, updateTodoDto: UpdateTodoDto) {
-    const todo = await this.findOne(id);
-    const user = {...todo, ...updateTodoDto};
-    console.log(user)
-    return this.todosRepository.save({...todo, ...updateTodoDto});
+    const todo = await this.findOne(id); 
+    return this.todosRepository.save({...todo[0], ...updateTodoDto});
   }
 
   async remove(id: number) {
