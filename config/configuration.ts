@@ -2,6 +2,8 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import * as Joi from 'joi';
 import { DataSource, DataSourceOptions } from "typeorm";
 
+console.log(process.env)
+
 const schema = Joi.object({
     DB_PORT: Joi.number().required(),
     DB_USER: Joi.string().required(),
@@ -30,8 +32,20 @@ export const configuration: DataSourceOptions = {
     host: process.env.DB_HOST,
     type: "mysql",
     entities: ['./dist/**/*.entity.js'],
-    migrations: ['.//db/migrations/*.js']
+    migrations: ['./dist/db/migrations/*.js']
 };
 
-export const dataSource = new DataSource(configuration);
+// export const configuration2: DataSourceOptions = {
+//     type: 'mysql',
+//     host: 'localhost',
+//     port: 3306,
+//     username: 'root',
+//     password: '8888',
+//     database: 'todo',
+//     entities: ['./dist/**/*.entity.js'],
+//     synchronize: false,
+//     migrations: ['./dist/db/migrations/*.js']
+// };
+
+const dataSource = new DataSource(configuration);
 export default dataSource;
