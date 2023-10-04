@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import * as Joi from 'joi';
 import { DataSource, DataSourceOptions } from "typeorm";
@@ -34,18 +36,6 @@ export const configuration: DataSourceOptions = {
     entities: ['./dist/**/*.entity.js'],
     migrations: ['./dist/db/migrations/*.js']
 };
-
-// export const configuration2: DataSourceOptions = {
-//     type: 'mysql',
-//     host: 'localhost',
-//     port: 3306,
-//     username: 'root',
-//     password: '8888',
-//     database: 'todo',
-//     entities: ['./dist/**/*.entity.js'],
-//     synchronize: false,
-//     migrations: ['./dist/db/migrations/*.js']
-// };
 
 const dataSource = new DataSource(configuration);
 export default dataSource;
