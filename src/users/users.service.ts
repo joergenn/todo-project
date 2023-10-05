@@ -33,6 +33,18 @@ export class UsersService {
     return user;
   }
 
+  async findByEmail(email: string) {
+    const user = await this.users.find({
+      where: {
+        email: email
+      }
+    });
+    if(Object.keys(user).length === 0) {
+      throw new HttpException("User with such email not found", HttpStatus.NOT_FOUND)
+    }; 
+    return user[0];
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id);
     Object.keys(updateUserDto).forEach(key => {
