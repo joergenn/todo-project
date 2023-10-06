@@ -25,11 +25,6 @@ export class User {
     })
     password: string;
 
-    @Column({
-        type: "boolean",
-    })
-    isAdmin: boolean;
-
     @OneToMany(() => Todo, todo => todo.user)
     todos: Todo[];
 }

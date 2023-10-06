@@ -17,9 +17,9 @@ export class UsersService {
     return this.users.save(newUser);
   }
 
-  findAll() {
-    return this.users.find();
-  }
+  // findAll() {
+  //   return this.users.find();
+  // }
 
   async findOne(id: number) {
     const user = await this.users.find({
@@ -45,16 +45,16 @@ export class UsersService {
     return user[0];
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.findOne(id);
-    Object.keys(updateUserDto).forEach(key => {
-      user[0][key] = updateUserDto[key];
-    })
-    return this.users.save(user);
-  }
+  // async update(id: number, updateUserDto: UpdateUserDto) {
+  //   const user = await this.findOne(id);
+  //   Object.keys(updateUserDto).forEach(key => {
+  //     user[0][key] = updateUserDto[key];
+  //   })
+  //   return this.users.save(user);
+  // }
 
-  async remove(id: number) {
-    const user = await this.findOne(id);
-    return this.users.remove(user);
-  }
+  // async remove(id: number) {
+  //   const user = await this.findOne(id);
+  //   return this.users.remove(user);
+  // }
 }
