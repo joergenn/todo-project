@@ -1,28 +1,29 @@
 import { Module } from '@nestjs/common';
-import { configuration } from '../config/configuration'
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { TodosModule } from './todos/todos.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(configuration),
-    // TypeOrmModule.forRoot({
-    //   type: 'mysql',
-    //   host: 'localhost',
-    //   port: 3306,
-    //   username: 'root',
-    //   password: '8888',
-    //   database: 'todo',
-    //   entities: ['./dist/**/*.entity.js'],
-    //   synchronize: false,
-    // }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        DB_PORT: Joi.number().required(),
+        DB_USER: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_NAME: Joi.string().required(),
+        DB_HOST: Joi.string().required()
+      })
+    }),
     UsersModule,
     TodosModule,
     AuthModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

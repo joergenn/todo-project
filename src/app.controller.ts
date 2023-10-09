@@ -6,15 +6,9 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { UsersService } from './users/users.service';
 import { CreateUserDto } from './users/dto/create-user.dto';
 
-@Controller()
+@Controller('user')
 export class AppController {
   constructor(private readonly appService: AppService, private readonly authService: AuthService, private users: UsersService) {}
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
@@ -23,7 +17,7 @@ export class AppController {
   }
 
   @Post('register')
-  async register(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
+  async register(@Body() createUserDto: CreateUserDto) {
     return this.users.create(createUserDto);
   }
 }

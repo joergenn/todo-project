@@ -19,6 +19,6 @@ export class Todo {
     })
     completed: boolean;
 
-    @ManyToOne(() => User, user =>  user.todos, {onDelete: 'CASCADE', onUpdate: "CASCADE", nullable: false})
+    @ManyToOne(() => User, user =>  user.todos, {onDelete: 'CASCADE', onUpdate: "CASCADE", nullable: false, eager: true})
     user: User;
 }

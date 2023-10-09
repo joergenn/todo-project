@@ -1,40 +1,43 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, ValidationPipe, Req } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Request } from 'express';
+import { ConfigService} from '@nestjs/config';
 
 @Controller('todos')
+@UseGuards(JwtAuthGuard)
 export class TodosController {
-  constructor(private readonly todosService: TodosService) {}
+  constructor(private readonly todosService: TodosService, private configService: ConfigService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body(new ValidationPipe()) createTodoDto: CreateTodoDto) {
-    return this.todosService.create(createTodoDto);
+  create(@Body() createTodoDto: CreateTodoDto, @Req() request: Request) {
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    return this.todosService.create(createTodoDto, token);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.todosService.findAll();
+  findAll(@Req() request: Request) {
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    return this.todosService.findAll(token);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.todosService.findOne(id);
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    return this.todosService.findOne(id, token);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todosService.update(id, updateTodoDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateTodoDto: UpdateTodoDto, @Req() request: Request) {
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    return this.todosService.update(id, updateTodoDto, token);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.todosService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    return this.todosService.remove(id, token);
   }
 }

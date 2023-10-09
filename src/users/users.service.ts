@@ -4,6 +4,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { NotFoundException} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -12,8 +14,9 @@ export class UsersService {
     private users: Repository<User>,
   ){}
 
-  create(createUserDto: CreateUserDto) {
-    const newUser = this.users.create(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const hash = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = this.users.create({...createUserDto, password: hash});
     return this.users.save(newUser);
   }
 
@@ -22,35 +25,34 @@ export class UsersService {
   // }
 
   async findOne(id: number) {
-    const user = await this.users.find({
+    const user = await this.users.findOne({
       where: {
         id: id
       }
     });
-    if(Object.keys(user).length === 0) {
-      throw new HttpException("User with such id not found", HttpStatus.NOT_FOUND)
-    }; 
+    if(!user){
+      throw new NotFoundException("User with such id not found");
+    }
     return user;
   }
 
   async findByEmail(email: string) {
-    const user = await this.users.find({
+    const user = await this.users.findOne({
       where: {
         email: email
       }
     });
-    if(Object.keys(user).length === 0) {
-      throw new HttpException("User with such email not found", HttpStatus.NOT_FOUND)
-    }; 
-    return user[0];
+    if(!user){
+      throw new NotFoundException("User with such email not found");
+    }
+    return user;
   }
 
   // async update(id: number, updateUserDto: UpdateUserDto) {
   //   const user = await this.findOne(id);
-  //   Object.keys(updateUserDto).forEach(key => {
-  //     user[0][key] = updateUserDto[key];
-  //   })
-  //   return this.users.save(user);
+  //   const hash = await bcrypt.hash(updateUserDto.password, 10);
+  //   const updatedUser = this.users.create({...user, ...updateUserDto, password: hash});
+  //   return this.users.save(updatedUser);
   // }
 
   // async remove(id: number) {
