@@ -14,7 +14,6 @@ export class Todo {
     title: string;
 
     @Column({
-        type: "boolean",
         default: false,
     })
     completed: boolean;

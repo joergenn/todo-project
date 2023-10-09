@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -8,6 +8,7 @@ import * as jwt from 'jsonwebtoken';
 import { ConfigService} from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { NotFoundException, BadRequestException} from '@nestjs/common';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class TodosService {
@@ -30,16 +31,8 @@ export class TodosService {
     }
   }
 
-  async findAll(token: string) {
-    let decoded: string | jwt.JwtPayload;
-    try {
-      decoded = jwt.verify(token, this.configService.get('SECRET'));
-    } catch (error) {
-      console.error('Error decoding JWT token:', error);
-      throw new BadRequestException("Failed to verify user");
-    }
-    const userId = +decoded.sub;
-    const user = await this.usersService.findOne(userId);
+  async findAll(id: number) {
+    const user = await this.usersService.findOne(id);
     return this.todos.find({
       where: {
         user: user
@@ -47,15 +40,7 @@ export class TodosService {
     });
   }
 
-  async findOne(id: number, token: string) {
-    let decoded: string | jwt.JwtPayload;
-    try {
-      decoded = jwt.verify(token, this.configService.get('SECRET'));
-    } catch (error) {
-      console.error('Error decoding JWT token:', error);
-      throw new BadRequestException("Failed to verify user");
-    }
-    const userId = +decoded.sub;
+  async findOne(id: number, user: number) {
     const todo = await this.todos.findOne({
       where: {
         id: id
@@ -64,35 +49,19 @@ export class TodosService {
     if(!todo){
       throw new NotFoundException("Todo with such id not found");
     }
-    if(todo.user.id !== userId) throw new BadRequestException("User cannot read other user's todo");
+    if(todo.user.id !== user) throw new BadRequestException("User cannot read other user's todo");
     return todo;
   }
 
-  async update(id: number, updateTodoDto: UpdateTodoDto, token: string) {
-    let decoded: string | jwt.JwtPayload;
-    try {
-      decoded = jwt.verify(token, this.configService.get('SECRET'));
-    } catch (error) {
-      console.error('Error decoding JWT token:', error);
-      throw new BadRequestException("Failed to verify user");
-    }
-    const userId = +decoded.sub;
-    const todo = await this.findOne(id, token); 
-    if(todo.user.id !== userId) throw new BadRequestException("User cannot update other user's todos");
+  async update(id: number, updateTodoDto: UpdateTodoDto, user: number) {
+    const todo = await this.findOne(id, user); 
+    if(todo.user.id !== user) throw new BadRequestException("User cannot update other user's todos");
     return this.todos.save({...todo, ...updateTodoDto});
   }
 
-  async remove(id: number, token: string) {
-    let decoded: string | jwt.JwtPayload;
-    try {
-      decoded = jwt.verify(token, this.configService.get('SECRET'));
-    } catch (error) {
-      console.error('Error decoding JWT token:', error);
-      throw new BadRequestException("Failed to verify user");
-    }
-    const userId = +decoded.sub;
-    const todo = await this.findOne(id, token); 
-    if(todo.user.id !== userId) throw new BadRequestException("User cannot delete other user's todos");
+  async remove(id: number, user: number) {
+    const todo = await this.findOne(id, user); 
+    if(todo.user.id !== user) throw new BadRequestException("User cannot delete other user's todos");
     return this.todos.remove(todo);
   }
 }
