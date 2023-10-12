@@ -5,7 +5,7 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class TodosService {
@@ -15,7 +15,7 @@ export class TodosService {
   ){}
 
   async create(createTodoDto: CreateTodoDto, user: User) {
-    const newTodo = this.todos.create({...createTodoDto, user: user});
+    const newTodo = this.todos.create({...createTodoDto, userId: user.id});
     return this.todos.save(newTodo);
   }
 

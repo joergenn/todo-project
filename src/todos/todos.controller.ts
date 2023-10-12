@@ -3,7 +3,9 @@ import { TodosService } from './todos.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ReqUser } from 'src/types';
+import { Request } from 'express';
+import { CurrentUser } from 'src/decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('todos')
 @UseGuards(JwtAuthGuard)
@@ -11,27 +13,27 @@ export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Post()
-  create(@Body() createTodoDto: CreateTodoDto, @Req() req: ReqUser) {
-    return this.todosService.create(createTodoDto, req.user);
+  create(@Body() createTodoDto: CreateTodoDto, @Req() req: Request, @CurrentUser() user: User) {
+    return this.todosService.create(createTodoDto, user);
   }
 
   @Get()
-  findAll(@Req() req: ReqUser) {
-    return this.todosService.findAll(req.user);
+  findAll(@Req() req: Request, @CurrentUser() user: User) {
+    return this.todosService.findAll(user);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: ReqUser) {
-    return this.todosService.findOne(id, req.user);
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request, @CurrentUser() user: User) {
+    return this.todosService.findOne(id, user);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateTodoDto: UpdateTodoDto, @Req() req: ReqUser) {
-    return this.todosService.update(id, updateTodoDto, req.user);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateTodoDto: UpdateTodoDto, @Req() req: Request, @CurrentUser() user: User) {
+    return this.todosService.update(id, updateTodoDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Req() req: ReqUser) {
-    return this.todosService.remove(id, req.user);
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: Request, @CurrentUser() user: User) {
+    return this.todosService.remove(id, user);
   }
 }
