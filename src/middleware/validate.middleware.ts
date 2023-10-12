@@ -14,7 +14,7 @@ export class ValidateMiddleware implements NestMiddleware{
         private readonly usersService: UsersService,
     ) {}
        
-    async use(req: Request, res: Response, next: NextFunction){
+    async use(req: Request & { user: User }, res: Response, next: NextFunction){
         const token = req.headers['authorization'].replace('Bearer ', '');
         let decoded: string | jwt.JwtPayload;
         try {
